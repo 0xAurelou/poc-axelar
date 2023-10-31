@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@axelar-network/axelar-gmp-sdk-solidity": "^5.5.2",
+    "ethers": "^6.8.0"
+  }
+}
