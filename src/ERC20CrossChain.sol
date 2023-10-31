@@ -21,7 +21,7 @@ contract ERC20CrossChain is AxelarExecutable, ERC20, Upgradable, IERC20CrossChai
 
     constructor(address gateway_, address gasReceiver_, uint8 decimals_)
         AxelarExecutable(gateway_)
-        ERC20("", "", decimals_)
+        ERC20("Ethereum STBC", "ESTBC", decimals_)
     {
         gasService = IAxelarGasService(gasReceiver_);
     }
