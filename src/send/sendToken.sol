@@ -1,96 +1,99 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.20;
+pragma solidity ^0.8.0;
 
-import {IAxelarGateway} from "axelar/interfaces/IAxelarGateway.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {InterchainTokenStandard} from
+    "@axelar-network/interchain-token-service/contracts/interchain-token/InterchainTokenStandard.sol";
+// Any ERC20 implementation can be used here, we chose OZ since it is quite well known.
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-error ONLY_OWNER_CAN_CALL();
+import {Minter} from "@axelar-network/interchain-token-service/contracts/utils/Minter.sol";
+/**
+ * @title InterchainToken
+ * @notice This contract implements an interchain token which extends InterchainToken functionality.
+ * @dev This contract also inherits Minter and Implementation logic.
+ */
 
-contract SendToken {
-    /// @notice variable to store the IAxelarGateway
-    IAxelarGateway public immutable gateway;
+contract CustomToken is InterchainTokenStandard, ERC20, Minter {
+    uint8 internal immutable decimals_;
+    bytes32 internal tokenId;
+    address internal immutable interchainTokenService_;
 
-    /// @notice variable to store the ERC20 Token
-    IERC20 public immutable token;
+    uint256 internal constant UINT256_MAX = 2 ** 256 - 1;
 
-    /// @notice address of the owner
-    address private owner;
+    /**
+     * @notice Constructs the InterchainToken contract.
+     * @dev Makes the implementation act as if it has been setup already to disallow calls to init() (even though that would not achieve anything really).
+     */
+    constructor(
+        string memory name_,
+        string memory symbol_,
+        uint8 decimalsValue,
+        address interchainTokenServiceAddress
+    ) ERC20(name_, symbol_) {
+        decimals_ = decimalsValue;
+        interchainTokenService_ = interchainTokenServiceAddress;
 
-    /// @notice modifier to check that only the owner address can call the function
-    modifier onlyOwner() {
-        if (msg.sender != owner) {
-            revert ONLY_OWNER_CAN_CALL();
+        _addMinter(interchainTokenService_);
+        _addMinter(msg.sender);
+    }
+
+    function decimals() public view override returns (uint8) {
+        return decimals_;
+    }
+
+    function setTokenId(bytes32 tokenId_) public {
+        tokenId = tokenId_;
+    }
+
+    /**
+     * @notice Returns the interchain token service
+     * @return address The interchain token service contract
+     */
+    function interchainTokenService() public view override returns (address) {
+        return interchainTokenService_;
+    }
+
+    /**
+     * @notice Returns the tokenId for this token.
+     * @return bytes32 The token manager contract.
+     */
+    function interchainTokenId() public view override returns (bytes32) {
+        return tokenId;
+    }
+
+    /**
+     * @notice Function to mint new tokens.
+     * @dev Can only be called by the minter address.
+     * @param account The address that will receive the minted tokens.
+     * @param amount The amount of tokens to mint.
+     */
+    function mint(address account, uint256 amount) external onlyRole(uint8(Roles.MINTER)) {
+        _mint(account, amount);
+    }
+
+    /**
+     * @notice Function to burn tokens.
+     * @dev Can only be called by the minter address.
+     * @param account The address that will have its tokens burnt.
+     * @param amount The amount of tokens to burn.
+     */
+    function burn(address account, uint256 amount) external onlyRole(uint8(Roles.MINTER)) {
+        _burn(account, amount);
+    }
+
+    /**
+     * @notice A method to be overwritten that will decrease the allowance of the `spender` from `sender` by `amount`.
+     * @dev Needs to be overwritten. This provides flexibility for the choice of ERC20 implementation used. Must revert if allowance is not sufficient.
+     */
+    function _spendAllowance(address sender, address spender, uint256 amount)
+        internal
+        override(ERC20, InterchainTokenStandard)
+    {
+        uint256 _allowance = allowance(sender, spender);
+
+        if (_allowance != UINT256_MAX) {
+            _approve(sender, spender, _allowance - amount);
         }
-        _;
-    }
-
-    /**
-     * @notice constructor to set gateway and token address
-     * @param _gateway address of the gateway of the Blockchain you are sending token from
-     * @param _token address of the erc20 token of the Blockchain you are sending token from
-     */
-    constructor(address _gateway, address _token, address _owner) {
-        gateway = IAxelarGateway(_gateway);
-        token = IERC20(_token);
-        owner = _owner;
-    }
-
-    /**
-     * @notice function to send token from Polygon chain to Avalance chain
-     * @param _amount amount of token
-     */
-    function send(
-        string calldata _token,
-        uint256 _amount,
-        string calldata _receiver,
-        string calldata _blockchain
-    ) external {
-        token.approve(address(gateway), _amount);
-        gateway.sendToken(
-            _blockchain, // network to send
-            _receiver, // address to send
-            _token, // token name
-            _amount // amount of token
-        );
-    }
-
-    /**
-     * @notice function to withdraw tokens from the contract
-     * @param _receiver address of the receiver
-     * @param _amount amount of tokens
-     */
-    function withdraw(address _receiver, uint256 _amount) external onlyOwner {
-        token.transfer(_receiver, _amount);
-    }
-
-    /**
-     * @notice function to change the owner of this smart contract
-     * @param _newOwner address of the new owner
-     */
-    function changeOwner(address _newOwner) external onlyOwner {
-        owner = _newOwner;
-    }
-
-    //////////////// Getter Funtions /////////////////
-    /**
-     * @notice function to get the Token balance of the smart contract
-     */
-    function getBalance() external view returns (uint256) {
-        return token.balanceOf(address(this));
-    }
-
-    /**
-     * @notice function to get the token balance of the user
-     */
-    function getUserBalance(address _user) external view returns (uint256) {
-        return token.balanceOf(_user);
-    }
-
-    /**
-     * @notice function to get the address of the owner
-     */
-    function getOwner() external view returns (address) {
-        return owner;
     }
 }
