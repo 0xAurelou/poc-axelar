@@ -1,2 +1,3 @@
 axelar/=lib/axelar-gmp-sdk-solidity/contracts/
+axelar-interchain/=lib/interchain-token-service/contracts/
 @openzeppelin/=lib/openzeppelin-contracts/

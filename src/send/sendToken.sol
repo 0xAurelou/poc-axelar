@@ -3,11 +3,11 @@
 pragma solidity ^0.8.0;
 
 import {InterchainTokenStandard} from
-    "@axelar-network/interchain-token-service/contracts/interchain-token/InterchainTokenStandard.sol";
+    "axelar-interchain/interchain-token/InterchainTokenStandard.sol";
 // Any ERC20 implementation can be used here, we chose OZ since it is quite well known.
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-import {Minter} from "@axelar-network/interchain-token-service/contracts/utils/Minter.sol";
+import {Minter} from "axelar-interchain/utils/Minter.sol";
 /**
  * @title InterchainToken
  * @notice This contract implements an interchain token which extends InterchainToken functionality.

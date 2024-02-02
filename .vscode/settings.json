@@ -9,6 +9,7 @@
     "editor.defaultFormatter": "JuanBlanco.solidity",
     "solidity.packageDefaultDependenciesDirectory": "lib",
     "cSpell.words": [
-        "axelar"
+        "axelar",
+        "interchain",
     ]
 }
