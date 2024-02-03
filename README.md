@@ -1,6 +1,7 @@
 # Poc-Alexar
 
-Currently waiting for Axelar team to finish refacto of international-token-service
+Interchain token based on Axelar Interchain Token Service technology
+
 
 ## Foundry
 
