@@ -6,14 +6,13 @@ import "forge-std/Test.sol";
 import "forge-std/console.sol"; // Import for logging outputs in tests
 
 import "axelar/test/token/ERC20MintableBurnableInit.sol"; // Import for ERC20 token
-import "axelar/test/mocks/MockGateway.sol"; // Import MockGateway for testing
+
+import {InterchainTokenService} from "axelar-interchain/InterchainTokenService.sol";
+import {ITokenManagerType} from "axelar-interchain/interfaces/ITokenManagerType.sol";
 
 import "src/send/sendToken.sol";
 
 contract SendTokenTest is Test {
-    MockGateway public gatewayEth;
-    MockGateway public gatewayPoly;
-
     CustomToken public tknEth;
     CustomToken public tknPoly;
 
@@ -37,6 +36,17 @@ contract SendTokenTest is Test {
         tknEth.mint(aliceEth, 100e18); // Mint 100 tokens to Alice on Ethereum
         console.log("Tokens minted to Alice on Ethereum");
         deal(aliceEth, 10e18); // Provide Alice with some ETH for gas fees
+    }
+
+    function testDeployTokenManagerArbi() public {
+        address interChainServiceAddr = 0xB5FB4BE02232B1bBA4dC8f81dc24C26980dE9e3C;
+        InterchainTokenService(interChainServiceAddr).deployTokenManager(
+            bytes32(bytes("usual")),
+            "Polygon",
+            ITokenManagerType.TokenManagerType.MINT_BURN,
+            abi.encode(msg.sender, address(tknEth)),
+            0.01e17
+        );
     }
 
     function testDeployArbi() public {

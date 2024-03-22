@@ -8,12 +8,12 @@ import {InterchainTokenStandard} from
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 import {Minter} from "axelar-interchain/utils/Minter.sol";
+
 /**
  * @title InterchainToken
  * @notice This contract implements an interchain token which extends InterchainToken functionality.
  * @dev This contract also inherits Minter and Implementation logic.
  */
-
 contract CustomToken is InterchainTokenStandard, ERC20, Minter {
     bytes32 internal tokenId;
     address internal immutable interchainTokenService_;
