@@ -28,33 +28,29 @@ contract SendTokenTest is Test {
     function setUp() public {
         // Create forks for Ethereum and Polygon chains for testing
         ethereumForkId = vm.createFork("eth");
-        polygonForkId = vm.createFork("polygon");
+        polygonForkId = vm.createFork("arbi");
 
         // Select the Ethereum fork and deploy the ERC20 token on Ethereum
         vm.selectFork(ethereumForkId);
-        tknEth = new CustomToken(
-            "Ethereum STBC", "ESTBC", 18, 0xB5FB4BE02232B1bBA4dC8f81dc24C26980dE9e3C
-        );
+        tknEth = new CustomToken("Ethereum STBC", "ESTBC");
         console.log("Token deployed on Ethereum at address: ", address(tknEth));
-
-        vm.selectFork(polygonForkId);
-        tknPoly =
-            new CustomToken("Polygon STBC", "PSTBC", 18, 0xB5FB4BE02232B1bBA4dC8f81dc24C26980dE9e3C);
-
-        console.log("Token deployed on Polygon at address: ", address(tknPoly));
-    }
-
-    // Mint tokens on Ethereum and approve the gateway for token transfer
-    function mintTokenEth() public {
-        vm.selectFork(ethereumForkId);
         tknEth.mint(aliceEth, 100e18); // Mint 100 tokens to Alice on Ethereum
         console.log("Tokens minted to Alice on Ethereum");
         deal(aliceEth, 10e18); // Provide Alice with some ETH for gas fees
     }
 
+    function testDeployArbi() public {
+        // Select the Polygon fork and deploy the ERC20 token on Polygon
+        vm.selectFork(polygonForkId);
+        tknPoly = new CustomToken("Polygon STBC", "PSTBC");
+
+        console.log("Token deployed on Polygon at address: ", address(tknPoly));
+    }
+
     // Test sending tokens from Ethereum to Polygon
     function testSendTokenEthToPolygon() public {
-        mintTokenEth();
+        testDeployArbi();
+        vm.selectFork(ethereumForkId);
         vm.makePersistent(alicePoly);
         vm.makePersistent(address(tknPoly));
         vm.makePersistent(aliceEth);
@@ -66,7 +62,7 @@ contract SendTokenTest is Test {
 
         vm.selectFork(ethereumForkId);
 
-        bytes memory recipient = abi.encodePacked(alicePoly);
+        bytes memory recipient = abi.encode(alicePoly);
         vm.prank(aliceEth);
         tknEth.interchainTransfer("Polygon", recipient, 10e18, "");
 

@@ -15,7 +15,6 @@ import {Minter} from "axelar-interchain/utils/Minter.sol";
  */
 
 contract CustomToken is InterchainTokenStandard, ERC20, Minter {
-    uint8 internal immutable decimals_;
     bytes32 internal tokenId;
     address internal immutable interchainTokenService_;
 
@@ -25,21 +24,11 @@ contract CustomToken is InterchainTokenStandard, ERC20, Minter {
      * @notice Constructs the InterchainToken contract.
      * @dev Makes the implementation act as if it has been setup already to disallow calls to init() (even though that would not achieve anything really).
      */
-    constructor(
-        string memory name_,
-        string memory symbol_,
-        uint8 decimalsValue,
-        address interchainTokenServiceAddress
-    ) ERC20(name_, symbol_) {
-        decimals_ = decimalsValue;
-        interchainTokenService_ = interchainTokenServiceAddress;
+    constructor(string memory name_, string memory symbol_) ERC20(name_, symbol_) {
+        interchainTokenService_ = 0xB5FB4BE02232B1bBA4dC8f81dc24C26980dE9e3C;
 
         _addMinter(interchainTokenService_);
         _addMinter(msg.sender);
-    }
-
-    function decimals() public view override returns (uint8) {
-        return decimals_;
     }
 
     function setTokenId(bytes32 tokenId_) public {

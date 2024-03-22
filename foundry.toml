@@ -38,7 +38,7 @@ include_push_bytes = true
 
 [rpc_endpoints]
 eth = "https://mainnet.infura.io/v3/471b61f9377c47c0a3be9c48286434bc"
-polygon = "https://polygon-mainnet.infura.io/v3/471b61f9377c47c0a3be9c48286434bc"
+arbi = "https://arbitrum-mainnet.infura.io/v3/471b61f9377c47c0a3be9c48286434bc"
 
 [fmt]
 line_length = 100

@@ -17,7 +17,7 @@ contract ERC20CrossChainTest is Test {
 
     function setUp() public {
         ethereumForkId = vm.createFork("eth");
-        polygonForkId = vm.createFork("polygon");
+        polygonForkId = vm.createFork("arbi");
         vm.selectFork(ethereumForkId);
         erc20CrossChainEth = new ERC20CrossChain(
             // Gateway address on ethereum
