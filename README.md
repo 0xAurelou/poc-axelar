@@ -1,5 +1,8 @@
 # Poc-Alexar
 
+## Warning
+⚠️ Do not use in production seems Axelar halted the tokenManager deployment
+
 Interchain token based on Axelar Interchain Token Service technology
 
 
